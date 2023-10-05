@@ -1,0 +1,59 @@
+-- ----------------------------------
+-- ESTUDIANTE: Heydi Chaina Velasquez
+-- ----------------------------------
+  
+CREATE TABLE Personas (
+PersonaID INT IDENTITY(1,1) PRIMARY KEY,
+Nombre VARCHAR(50) NOT NULL,
+ApellidoPaterno VARCHAR(25) NOT NULL,
+ApelidoMaterno VARCHAR(25) NOT NULL,
+FechaNacimiento DATE,
+EstadoCivil VARCHAR(10),
+Correo VARCHAR(50) UNIQUE,
+Telefono VARCHAR(10),
+NumeroDoc INT UNIQUE
+);
+
+CREATE TABLE Usuario (
+UsuarioID INT IDENTITY,
+Usuario VARCHAR(50) UNIQUE NOT NULL,
+Contrasenia VARCHAR(50) NOT NULL,
+Estado VARCHAR(10)
+);
+
+INSERT INTO Personas (Nombre, ApellidoPaterno, ApellidoMaterno, FechaNacimiento, EstadoCivil, Correo, Telefono, NumeroDoc)
+
+VALUES
+('Heydi', “Chaina', Velasquez', '2000/10/07', 'Soltera', 'heydi@gmail.com', '950547832', '78945629'),
+('Juan', 'Perez', 'Lopez', '1995/05/15', 'Casado', 'juan.perez@gmail.com', '987654321', '12345678'),
+('Maria', 'Gonzalez', 'Martinez', '1988/07/23', 'Divorciada', 'maria.gonzalez@gmail.com', '912345678', '23456789'),
+('Carlos', 'Ramirez', 'Lopez', '1990/03/20', 'Soltero', 'carlos.ramirez@gmail.com', '998877665', '11223344'),
+('Laura', 'Martinez', 'Fernandez', '1985/11/10', 'Casada', 'laura.martinez@gmail.com', '987654321', '22334455'),
+('Pedro', 'Gomez', 'Hernandez', '1978/06/05', 'Divorciado', 'pedro.gomez@gmail.com', '945678321', '33445566'),
+('Ana', 'Rodriguez', 'Sanchez', '1992/09/15', 'Soltera', 'ana.rodriguez@gmail.com', '932156789', '44556677'),
+('Javier', 'Diaz', 'Torres', '1980/04/25', 'Casado', 'javier.diaz@gmail.com', '914785236', '55667788'),
+('Elena', 'Lopez', 'Martinez', '1987/08/30', 'Casada', 'elena.lopez@gmail.com', '976543210', '66778899'),
+('Alejandro', 'Herrera', 'Castro', '1993/02/12', 'Soltero', 'alejandro.herrera@gmail.com', '965874123', '77889900'),
+('Sofia', 'Perez', 'Fernandez', '1983/07/08', 'Divorciada', 'sofia.perez@gmail.com', '954213876', '88990011'),
+('Miguel', 'Torres', 'Garcia', '1975/12/03', 'Viudo', 'miguel.torres@gmail.com', '932145678', '99001122'),
+('Luis', 'Gutierrez', 'Santos', '1991/06/18', 'Soltero', 'luis.gutierrez@gmail.com', '978563421', '00112233'),
+('Marina', 'Moreno', 'Herrera', '1989/01/22', 'Casada', 'marina.moreno@gmail.com', '945213678', '11223344'),
+('Diego', 'Vargas', 'Fernandez', '1986/05/07', 'Soltero', 'diego.vargas@gmail.com', '954321789', '22334455'),
+('Carmen', 'Rojas', 'Molina', '1982/10/14', 'Casada', 'carmen.rojas@gmail.com', '964215873', '33445566'),
+('Oscar', 'Cruz', 'Rios', '1979/03/30', 'Divorciado', 'oscar.cruz@gmail.com', '923147856', '44556677'),
+('Alicia', 'Fernandez', 'Reyes', '1995/08/11', 'Soltera', 'alicia.fernandez@gmail.com', '987654321', '55667788');
+
+-- Crea una función que devuleva la edad de los usuarios en formato edad + años de edad
+CREATE FUNCTION CalcularEdadTodasPersonas ()
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT 
+        UPPER(Nombre) + ' ' + ApellidoPaterno + ' ' + ApellidoMaterno AS NombreCompleto,
+        DATEDIFF(YEAR, FechaNacimiento, GETDATE()) AS Edad,
+        CAST(DATEDIFF(YEAR, FechaNacimiento, GETDATE()) AS VARCHAR(10)) + ' años de edad' AS DescripcionEdad
+    FROM Personas
+);
+
+SELECT * FROM CalcularEdadTodasPersonas();
