@@ -1,0 +1,63 @@
+CREATE TABLE Usuarios (
+    UsuarioID INT IDENTITY(1,1) PRIMARY KEY,
+    PersonaID INT FOREIGN KEY REFERENCES Personas(PersonaID),
+    Usuario NVARCHAR(50) NOT NULL,
+    Contrasenia NVARCHAR(128) NOT NULL,
+    FechaRegistro DATETIME NOT NULL,
+);
+
+ALTER TABLE Usuarios
+ADD Estado NVARCHAR(10)
+
+SELECT * FROM Usuarios;
+
+-- INSERT INTO para valores de ejemplo, asegúrate de tener los valores correctos de PersonaID y las contraseñas deben ser almacenadas de forma segura (usando técnicas de hashing)
+INSERT INTO Usuarios (PersonaID, Usuario, Contrasenia, FechaRegistro, Estado)
+VALUES
+	(31, 'admin', 'hashed_password_admin', '2023-10-06T00:00:00', 'Activo'),
+	(30, 'heydi', 'hashed_password_12345', '2023-10-06T00:00:00', 'Activo');
+
+
+SELECT * FROM Personas;
+
+CREATE VIEW PersonaReporte AS 
+SELECT 
+    Nombre,
+    ApellidoPaterno,
+    ApelidoMaterno,
+    FechaNacimiento, 
+    Telefono, 
+    Correo,
+    nc.NombresCompletos,
+    edad.DescripcionYEdad
+FROM Personas p
+CROSS APPLY dbo.ObtenerNombresCompletos(p.PersonaID) as nc
+CROSS APPLY dbo.ObtenerEdad(p.PersonaID) as edad;
+-- Llamar a la función
+SELECT * FROM PersonaReporte
+-- --------------------------------------------------------------------
+CREATE VIEW PersonaYUsuarioReporte AS 
+SELECT 
+    p.Nombre,
+    p.ApellidoPaterno,
+    p.ApelidoMaterno,
+    p.FechaNacimiento,
+    p.Correo,
+    p.Telefono,
+	nc.NombresCompletos,
+    edad.DescripcionYEdad,
+    u.UsuarioID,
+    u.Usuario,
+    u.Contrasenia,
+    u.FechaRegistro
+FROM Personas p
+INNER JOIN Usuarios u ON p.PersonaID = u.PersonaID
+CROSS APPLY dbo.ObtenerNombresCompletos(p.PersonaID) as nc
+CROSS APPLY dbo.ObtenerEdad(p.PersonaID) as edad;
+
+-- Llamar a la función
+SELECT * FROM PersonaYUsuarioReporte
+-- --------------------------------------------------------------------
+
+SELECT * FROM Personas as T1 INNER JOIN Usuarios as T2
+ON T1.PersonaID = T2.PersonaID
