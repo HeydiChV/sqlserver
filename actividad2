@@ -1,0 +1,51 @@
+CREATE FUNCTION FuncionEjercicio
+(
+	@ValorA DECIMAL(18,2),
+	@ValorB DECIMAL(18,2),
+	@Tipo INT, -- 1=Suma, 2=Resta, 3=Multiplicación, 4=División, 5=(HEYDI Chaina Velasquez; 23 años de edad)
+    @PersonaID INT = 1
+)
+RETURNS NVARCHAR(255)
+AS
+BEGIN
+    DECLARE @Resultado NVARCHAR(100)
+
+    IF @Tipo = 1 -- Suma
+	BEGIN
+		SET @Resultado = CAST(@ValorA + @ValorB AS NVARCHAR(50));
+	END
+	ELSE IF @Tipo = 2 -- Resta
+	BEGIN
+		SET @Resultado = CAST(@ValorA - @ValorB AS NVARCHAR(50));
+	END
+	ELSE IF @Tipo = 3 -- Multiplicación
+	BEGIN
+        SET @Resultado = CAST(@ValorA * @ValorB AS NVARCHAR(50));
+    END
+	ELSE IF @Tipo = 4 -- División
+    BEGIN
+        IF @ValorB <> 0
+            SET @Resultado = CAST(@ValorA / @ValorB AS NVARCHAR(50));
+        ELSE
+            SET @Resultado = 'División por cero no permitida';
+    END
+    ELSE IF @Tipo = 5
+	BEGIN
+		DECLARE @NombreCompleto NVARCHAR(100)
+		DECLARE @Edad INT
+
+		SELECT @NombreCompleto = UPPER(Nombre) + ' ' + ApellidoPaterno + ' ' + ApelidoMaterno,
+				@Edad = DATEDIFF(YEAR, FechaNacimiento, GETDATE())
+		FROM Personas
+		WHERE PersonaID = @PersonaID
+
+		IF @NombreCompleto IS NOT NULL
+			SET @Resultado = @NombreCompleto + '; ' + CAST(@Edad AS NVARCHAR(10)) + ' años de edad'
+		ELSE
+			SET @Resultado = 'Persona no encontrada';
+	END
+	ELSE
+        SET @Resultado = 'Opción inválida';
+
+    RETURN @Resultado;
+END;
