@@ -39,13 +39,16 @@ BEGIN
             THROW 51005, 'Los nombres y apellidos deben tener al menos 3 caracteres', 101;
         END;
 
-        DECLARE @NombreCorreo NVARCHAR(255);
-        SET @NombreCorreo = LEFT(@Correo, CHARINDEX('@', @Correo) - 1);
+        DECLARE @Dominio NVARCHAR(255);
+	DECLARE @NombreCorreo NVARCHAR(255);
+	SET @Dominio = RIGHT(@Correo, CHARINDEX('@', REVERSE(@Correo)) - 1);
+	SET @NombreCorreo = LEFT(@Correo, LEN(@Correo) - LEN(@Dominio) - 1);
 
-        IF @NombreCorreo <> @Nombre + '.' + @ApellidoPaterno + '@gmail.com'
-        BEGIN
-            THROW 51006, 'El formato del correo debe ser Nombre.ApellidoPaterno@gmail.com', 106;
-        END;
+		IF @Dominio <> 'gmail.com' OR @NombreCorreo <> @Nombre + '.' + @ApellidoPaterno
+		BEGIN
+			THROW 51006, 'El formato del correo debe ser Nombre.ApellidoPaterno@gmail.com', 106;
+		END;
+
 
         COMMIT TRANSACTION;
         PRINT 'Transacción completada';
@@ -68,7 +71,7 @@ DECLARE @Nombre NVARCHAR(100) = 'Heydi';
 DECLARE @ApellidoPaterno NVARCHAR(100) ='Chaina';
 DECLARE @ApelidoMaterno NVARCHAR(100) = 'Velasquez';
 DECLARE @FechaNacimiento DATE = '2023-01-10';
-DECLARE @Correo NVARCHAR(255) = 'heydi.ch@gmail.com';
+DECLARE @Correo NVARCHAR(255) = 'heydi.chain@gmail.com';
 DECLARE @NumeroDoc NVARCHAR(10) = '73884562';
 
 EXEC CrearPersona
