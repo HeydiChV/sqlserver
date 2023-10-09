@@ -1,0 +1,80 @@
+-- ----------------------------------------------
+-- ESTUDIANTE: Heydi Chaina Velasquez
+-- ----------------------------------------------
+ALTER PROCEDURE [dbo].[CrearPersona](
+    @Nombre NVARCHAR(100),
+    @ApellidoPaterno NVARCHAR(100),
+    @ApelidoMaterno NVARCHAR(100),
+    @FechaNacimiento DATE, -- validar
+    @Correo NVARCHAR(255), -- validar
+    @NumeroDoc NVARCHAR(10) -- validar
+)
+AS
+BEGIN
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF @FechaNacimiento >= GETDATE()
+        BEGIN
+            THROW 51001, 'La fecha de nacimiento debe ser anterior a la fecha actual', 81;
+        END;
+
+        IF LEN(@NumeroDoc) <> 8
+        BEGIN
+            THROW 51002, 'El número de caracteres debe ser igual a 8', 86;
+        END;
+
+        IF CHARINDEX('@', @Correo) = 0
+        BEGIN
+            THROW 51003, 'El correo debe contener una arroba (@)', 91;
+        END;
+
+        IF RIGHT(@Correo, 10) <> '@gmail.com'
+        BEGIN
+            THROW 51004, 'El correo debe terminar en @gmail.com', 96;
+        END;
+
+        IF LEN(@Nombre) < 3 OR LEN(@ApellidoPaterno) < 3 OR LEN(@ApelidoMaterno) < 3
+        BEGIN
+            THROW 51005, 'Los nombres y apellidos deben tener al menos 3 caracteres', 101;
+        END;
+
+        DECLARE @NombreCorreo NVARCHAR(255);
+        SET @NombreCorreo = LEFT(@Correo, CHARINDEX('@', @Correo) - 1);
+
+        IF @NombreCorreo <> @Nombre + '.' + @ApellidoPaterno + '@gmail.com'
+        BEGIN
+            THROW 51006, 'El formato del correo debe ser Nombre.ApellidoPaterno@gmail.com', 106;
+        END;
+
+        COMMIT TRANSACTION;
+        PRINT 'Transacción completada';
+
+    END TRY
+    BEGIN CATCH
+        PRINT 'Ingreso al CATCH';
+        PRINT 'Error Mensaje: ' + ERROR_MESSAGE();
+        PRINT 'Error Número: ' + CAST(ERROR_NUMBER() AS NVARCHAR(10));
+        PRINT 'Error Línea: ' + CAST(ERROR_LINE() AS NVARCHAR(10));
+
+        ROLLBACK;
+    END CATCH
+END;
+
+-- ----------------------------------------------
+-- ESTUDIANTE: Heydi Chaina Velasquez
+-- ----------------------------------------------
+DECLARE @Nombre NVARCHAR(100) = 'Heydi';
+DECLARE @ApellidoPaterno NVARCHAR(100) ='Chaina';
+DECLARE @ApelidoMaterno NVARCHAR(100) = 'Velasquez';
+DECLARE @FechaNacimiento DATE = '2023-01-10';
+DECLARE @Correo NVARCHAR(255) = 'heydi.ch@gmail.com';
+DECLARE @NumeroDoc NVARCHAR(10) = '73884562';
+
+EXEC CrearPersona
+	@Nombre = @Nombre,
+	@ApellidoPaterno = @ApellidoPaterno,
+	@ApelidoMaterno = @ApelidoMaterno,
+	@FechaNacimiento = @FechaNacimiento,
+	@Correo = @Correo,
+	@NumeroDoc = @NumeroDoc;
